@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar/Navbar'
 import styled from 'styled-components'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
+import axios from 'axios'
 
 const ContentWrapper = styled.div`
   background: #EEF5FF;
@@ -112,6 +114,20 @@ const FormBtn = styled.button`
 `
 
 const AddPost = () => {
+  const [title, setTitle] = useState('')
+  const [text, setText] = useState('')
+  const [imgUrl, setImgUrl] = useState('')
+
+  const addPost = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/post/add', {
+        title, text, imgUrl
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <ContentWrapper>
       <Head>
@@ -133,23 +149,23 @@ const AddPost = () => {
         </Link>
 
         <FormWrapper>
-          <Form>
+          <Form onSubmit={e => e.preventDefault()}>
             <InputField>
               <TextLabel>Название статьи:</TextLabel>
-              <Input />
+              <Input onChange={e => setTitle(e.target.value)} />
             </InputField>
 
             <InputField>
               <TextLabel>Текст статьи:</TextLabel>
-              <TextArea />
+              <TextArea onChange={e => setText(e.target.value)} />
             </InputField>
 
             <InputField>
               <TextLabel>URL картинки:</TextLabel>
-              <Input />
+              <Input onChange={e => setImgUrl(e.target.value)} />
             </InputField>
 
-            <FormBtn>Добавить</FormBtn>
+            <FormBtn onClick={addPost}>Добавить</FormBtn>
           </Form>
         </FormWrapper>
       </div>
