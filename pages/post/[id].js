@@ -3,6 +3,14 @@ import Navbar from '../../components/Navbar/Navbar'
 import styled from 'styled-components'
 import Link from 'next/link'
 import Image from 'next/image'
+import axios from 'axios'
+import { useRouter } from 'next/router';
+
+const Container = styled.div`
+  max-width: 1110px;
+  width: 100%;
+  margin: 0 auto;
+`
 
 const ContentWrapper = styled.div`
   background: #EEF5FF;
@@ -86,15 +94,24 @@ const RemovePostBtn = styled.p`
   cursor: pointer;
 `
 
-export default function Post() {
+export default function Post({ post }) {
+  const router = useRouter()
+
+  if (!post) 'Loading...'
+
+  const removePost = async () => {
+    await axios.post('http://localhost:5000/api/post/remove', { id: post._id })
+    .then(() => router.push('/'))
+  }
+
   return (
     <ContentWrapper>
       <Head>
-        <title>Post page</title>
+        <title>{post.title}</title>
       </Head>
       <Navbar />
 
-      <div className="container">
+      <Container>
         <Link href='/'>
           <BackBtn>
             <Image
@@ -109,28 +126,37 @@ export default function Post() {
 
         <PostWrapper>
           <PostItem>
-            <PostTitle>Альпы.  Покори вершину с нами!</PostTitle>
+            <PostTitle>{post.title}</PostTitle>
             <PostText>
-              А́льпы (фр. Alpes, нем. Alpen, итал. Alpi, романш. Alps, словен. Alpe) — самый высокий и протяжённый горный хребет среди систем, целиком лежащих в Европе. При этом Кавказские горы выше, а Уральские — протяжённей, но они лежат также и на территории Азии (в зависимости от выбранного определения границы между Европой и Азией).
-
-Альпы представляют собой сложную систему хребтов и массивов, протянувшуюся выпуклой к северо-западу дугой от Лигурийского моря до Среднедунайской низменности. Альпы располагаются на территории 8 стран: Франции, Монако, Италии, Швейцарии, Германии, Австрии, Лихтенштейна и Словении. Общая длина альпийской дуги составляет около 1200 км (по внутреннему краю дуги — около 750 км), ширина — до 260 км. Самой высокой вершиной Альп является гора Монблан высотой 4810 метров над уровнем моря, расположенная на границе Франции и Италии[1]. Всего в Альпах сосредоточено около 100 вершин-четырёхтысячников[2].
+              {post.text}
             </PostText>
           </PostItem>
 
           <PostItem>
             <Image
-              src="/static/images/post1.png"
-              alt="Pic 1"
+              src={post.imgUrl}
+              alt={post.title}
               width={540}
               height={316}
             />
           </PostItem>
 
-          <RemovePostBtn>Удалить статью</RemovePostBtn>
+          <RemovePostBtn onClick={removePost}>Удалить статью</RemovePostBtn>
         </PostWrapper>
 
-      </div>
+      </Container>
 
     </ContentWrapper>
   )
+}
+
+export async function getServerSideProps(context) {
+  const res = await fetch(`http://localhost:5000/api/post/${context.query.id}`)
+  const post = await res.json()
+
+  if (!post) return { notFound: true }
+
+  return {
+    props: {post},
+  }
 }

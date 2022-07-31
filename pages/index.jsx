@@ -3,6 +3,12 @@ import Navbar from '../components/Navbar/Navbar'
 import styled from 'styled-components'
 import Link from 'next/link'
 
+const Container = styled.div`
+  max-width: 1110px;
+  width: 100%;
+  margin: 0 auto;
+`
+
 const ContentWrapper = styled.div`
   background: #EEF5FF;
   min-height: 100vh;
@@ -45,43 +51,45 @@ const PostTitle = styled.div`
   border-radius: 0px 0px 15px 15px;
 `
 
-const Home = () => {
+const Home = ({ posts }) => {
+  if (!posts) 'Loading...'
 
   return (
     <ContentWrapper>
       <Head>
-        <title>Home page</title>
+        <title>NEXT BLOG | Статьи</title>
       </Head>
       <Navbar />
 
-      <div className='container'>
+      <Container>
         <PostsWrapper>
-          <Link href={'/post/[id]'} as={`/post/test`}>
-            <Post bgImage={'./static/images/post1.png'}>
-              <PostTitle>Мальдивы. Рай или пафос ?</PostTitle>
-            </Post>
-          </Link>
-          
-          <Post bgImage={'./static/images/post2.png'}>
-            <PostTitle>Италия. Остров Капри. Обзор.</PostTitle>
-          </Post>
-          <Post bgImage={'./static/images/post3.png'}>
-            <PostTitle>США. Сан-Франциско, дорого?</PostTitle>
-          </Post>
-          <Post bgImage={'./static/images/post4.png'}>
-            <PostTitle>Канада. Пейзажи вблизи Онтарио.</PostTitle>
-          </Post>
-          <Post bgImage={'./static/images/post5.png'}>
-            <PostTitle>Швейцария. Красота природы.</PostTitle>
-          </Post>
-          <Post bgImage={'./static/images/post6.png'}>
-            <PostTitle>Альпы. Покори вершину с нами!</PostTitle>
-          </Post>
+          {
+            posts.map(post => {
+              return (
+                <Link href={'/post/[id]'} as={`/post/${post._id}`} key={post._id}>
+                  <Post bgImage={post.imgUrl}>
+                    <PostTitle>{post.title}</PostTitle>
+                  </Post>
+                </Link>
+              )
+            })
+          }
         </PostsWrapper>
-      </div>
+      </Container>
 
     </ContentWrapper>
   )
+}
+
+export async function getServerSideProps() {
+  const res = await fetch('http://localhost:5000/api/post')
+  const posts = await res.json()
+
+  if (!posts) return { notFound: true }
+
+  return {
+    props: {posts},
+  }
 }
 
 export default Home

@@ -5,6 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import axios from 'axios'
+import { useRouter } from 'next/router'
+
+const Container = styled.div`
+  max-width: 1110px;
+  width: 100%;
+  margin: 0 auto;
+`
 
 const ContentWrapper = styled.div`
   background: #EEF5FF;
@@ -117,14 +124,16 @@ const AddPost = () => {
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [imgUrl, setImgUrl] = useState('')
+  const router = useRouter()
 
   const addPost = async () => {
     try {
       await axios.post('http://localhost:5000/api/post/add', {
         title, text, imgUrl
       })
+      .then(() => router.push('/'))
     } catch (error) {
-      console.log(error)
+      console.log('Add post error on client >>', error)
     }
   }
 
@@ -135,7 +144,7 @@ const AddPost = () => {
       </Head>
       <Navbar />
 
-      <div className="container">
+      <Container>
         <Link href='/'>
           <BackBtn>
             <Image
@@ -168,7 +177,7 @@ const AddPost = () => {
             <FormBtn onClick={addPost}>Добавить</FormBtn>
           </Form>
         </FormWrapper>
-      </div>
+      </Container>
 
     </ContentWrapper>
   )

@@ -17,11 +17,6 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
   }
-  .container {
-    max-width: 1110px;
-    width: 100%;
-    margin: 0 auto;
-  }
 `
 
 export default GlobalStyle

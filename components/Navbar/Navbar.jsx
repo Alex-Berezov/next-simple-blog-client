@@ -1,6 +1,12 @@
 import styled from 'styled-components'
 import Link from 'next/link'
 
+const Container = styled.div`
+  max-width: 1110px;
+  width: 100%;
+  margin: 0 auto;
+`
+
 const Nav = styled.nav`
   background: #FEFEFE;
   padding: 17px 0;
@@ -39,7 +45,7 @@ const AddPostBtn = styled.p`
 const Navbar = () => {
   return (
     <Nav>
-      <div className='container'>
+      <Container>
         <NavbarItem>
           <Link href="/">
             <Logo>NEXT | BLOG</Logo>
@@ -48,7 +54,7 @@ const Navbar = () => {
             <Link href="/add-post">Добавить статью</Link>
           </AddPostBtn>
         </NavbarItem>
-      </div>
+      </Container>
     </Nav>
   )
 }
