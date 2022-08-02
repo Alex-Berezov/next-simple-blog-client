@@ -1,7 +1,10 @@
+import react, { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Navbar from '../components/Navbar/Navbar'
 import styled from 'styled-components'
 import Link from 'next/link'
+import { useQuery } from '@apollo/client'
+import { GET_POSTS } from '../graphql/query/post'
 
 const Container = styled.div`
   max-width: 1110px;
@@ -51,8 +54,19 @@ const PostTitle = styled.div`
   border-radius: 0px 0px 15px 15px;
 `
 
-const Home = ({ posts }) => {
-  if (!posts) 'Loading...'
+const Home = () => {
+  const [posts, setPosts] = useState([])
+  const { loading, error, data, refetch } = useQuery(GET_POSTS)
+
+  useEffect(() => {
+    refetch()
+  }, [])
+
+  useEffect(() => {
+    if (!loading) return setPosts(data?.getAllPosts)
+  }, [data])
+
+  if (loading) return <h2>Loading ...</h2>
 
   return (
     <ContentWrapper>
@@ -79,17 +93,6 @@ const Home = ({ posts }) => {
 
     </ContentWrapper>
   )
-}
-
-export async function getServerSideProps() {
-  const res = await fetch('http://localhost:5000/api/post')
-  const posts = await res.json()
-
-  if (!posts) return { notFound: true }
-
-  return {
-    props: {posts},
-  }
 }
 
 export default Home

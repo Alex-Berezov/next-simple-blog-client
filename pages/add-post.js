@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
+import { useMutation } from '@apollo/client'
+import { CREATE_POST } from '../graphql/mutations/post'
 
 const Container = styled.div`
   max-width: 1110px;
@@ -121,6 +123,7 @@ const FormBtn = styled.button`
 `
 
 const AddPost = () => {
+  const [newPost] = useMutation(CREATE_POST)
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [imgUrl, setImgUrl] = useState('')
@@ -128,8 +131,12 @@ const AddPost = () => {
 
   const addPost = async () => {
     try {
-      await axios.post('http://localhost:5000/api/post/add', {
-        title, text, imgUrl
+      await newPost({
+        variables: {
+          input: {
+            title, text, imgUrl
+          }
+        }
       })
       .then(() => router.push('/'))
     } catch (error) {
