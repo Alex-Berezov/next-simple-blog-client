@@ -3,8 +3,10 @@ import Navbar from '../../components/Navbar/Navbar'
 import styled from 'styled-components'
 import Link from 'next/link'
 import Image from 'next/image'
-import axios from 'axios'
 import { useRouter } from 'next/router';
+import { useMutation, useQuery } from '@apollo/client'
+import { GET_ONE_POST } from '../../graphql/query/post'
+import { DELETE_POST } from '../../graphql/mutations/post'
 
 const Container = styled.div`
   max-width: 1110px;
@@ -94,20 +96,38 @@ const RemovePostBtn = styled.p`
   cursor: pointer;
 `
 
-export default function Post({ post }) {
+const Post = () => {
   const router = useRouter()
-
-  if (!post) 'Loading...'
+  const postId = router?.query?.id
+  const [deletePost] = useMutation(DELETE_POST)
+  const { loading, data } = useQuery(GET_ONE_POST, {
+    variables: {
+      id: postId
+    }
+  })
 
   const removePost = async () => {
-    await axios.post('http://localhost:5000/api/post/remove', { id: post._id })
-    .then(() => router.push('/'))
+    try {
+      console.log('====================================');
+      console.log('postId >>', postId);
+      console.log('====================================');
+      await deletePost({
+        variables: {
+          _id: postId
+        }
+      })
+      .then(() => router.push('/'))
+    } catch (error) {
+      console.log('Add post error on client >>', error)
+    }
   }
+
+  if (loading) return <h2>Loading ...</h2>
 
   return (
     <ContentWrapper>
       <Head>
-        <title>{post.title}</title>
+        <title>{data?.getPost?.title}</title>
       </Head>
       <Navbar />
 
@@ -126,16 +146,16 @@ export default function Post({ post }) {
 
         <PostWrapper>
           <PostItem>
-            <PostTitle>{post.title}</PostTitle>
+            <PostTitle>{data?.getPost?.title}</PostTitle>
             <PostText>
-              {post.text}
+              {data?.getPost?.text}
             </PostText>
           </PostItem>
 
           <PostItem>
             <Image
-              src={post.imgUrl}
-              alt={post.title}
+              src={data?.getPost?.imgUrl}
+              alt={data?.getPost?.title}
               width={540}
               height={316}
             />
@@ -150,13 +170,4 @@ export default function Post({ post }) {
   )
 }
 
-export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:5000/api/post/${context.query.id}`)
-  const post = await res.json()
-
-  if (!post) return { notFound: true }
-
-  return {
-    props: {post},
-  }
-}
+export default Post
