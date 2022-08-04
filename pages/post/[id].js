@@ -108,9 +108,6 @@ const Post = () => {
 
   const removePost = async () => {
     try {
-      console.log('====================================');
-      console.log('postId >>', postId);
-      console.log('====================================');
       await deletePost({
         variables: {
           _id: postId
