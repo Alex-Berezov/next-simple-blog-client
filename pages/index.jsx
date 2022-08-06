@@ -80,8 +80,12 @@ const Home = () => {
           {
             posts.map(post => {
               return (
-                <Link href={'/post/[id]'} as={`/post/${post._id}`} key={post._id}>
-                  <Post bgImage={post.imgUrl}>
+                <Link
+                  href={`/post/${encodeURIComponent(post.postSlug)}`}
+                  as={`/post/${post.postSlug}`}
+                  key={post._id}
+                >
+                  <Post bgImage={post.imgUrl}s>
                     <PostTitle>{post.title}</PostTitle>
                   </Post>
                 </Link>

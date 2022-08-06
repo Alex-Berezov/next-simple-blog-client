@@ -98,11 +98,11 @@ const RemovePostBtn = styled.p`
 
 const Post = () => {
   const router = useRouter()
-  const postId = router?.query?.id
+  const postSlug = router?.query?.id
   const [deletePost] = useMutation(DELETE_POST)
   const { loading, data } = useQuery(GET_ONE_POST, {
     variables: {
-      id: postId
+      postSlug
     }
   })
 
@@ -110,7 +110,7 @@ const Post = () => {
     try {
       await deletePost({
         variables: {
-          _id: postId
+          postSlug
         }
       })
       .then(() => router.push('/'))
@@ -121,10 +121,15 @@ const Post = () => {
 
   if (loading) return <h2>Loading ...</h2>
 
+  const description = data?.getPost?.text?.substr(0, 150).trim()
+
   return (
     <ContentWrapper>
       <Head>
         <title>{data?.getPost?.title}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={data?.getPost?.title} key="title" />
+        <meta property="og:description" content={description} key="description" />
       </Head>
       <Navbar />
 
